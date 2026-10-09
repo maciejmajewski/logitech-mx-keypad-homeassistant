@@ -29,6 +29,16 @@ TypeScript project template.
 [ws](https://github.com/websockets/ws), MIT License, is bundled into the plugin as the
 WebSocket client that talks to Home Assistant.
 
+## Home Assistant logo (not MIT)
+
+`plugins/home-assistant/assets/ha-logomark-*.svg`, and everything generated from them
+(`package/metadata/Icon256x256.png`, `package/action*/ha_connection.svg`, `src/logo.ts`),
+are the Home Assistant logomark from [home-assistant/assets](https://github.com/home-assistant/assets),
+licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). The logo is a
+trademark of the Open Home Foundation and is not available for commercial use without its
+written permission; this plugin is free and non-commercial. The MIT licence of this repository
+does not extend to these files.
+
 ## Documentation
 
 The [Logitech Actions SDK documentation](https://logitech.github.io/actions-sdk-docs/) and the

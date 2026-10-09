@@ -1,0 +1,47 @@
+{
+  "name": "home-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Logi Actions plugin: live Home Assistant entity tiles on the MX Creative Console, one press toggles the entity",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "scripts": {
+    "build": "npm run typecheck && tsup",
+    "build:pack": "npm run build:prod && npm run pack",
+    "build:prod": "npm run typecheck && cross-env NODE_ENV=production tsup",
+    "deck": "node scripts/render-deck.ts",
+    "icons": "node scripts/gen-logo.ts && node scripts/gen-icons.ts",
+    "link": "logitoolkit link",
+    "pack": "logitoolkit pack",
+    "smoke": "npm run build && node scripts/smoke.ts",
+    "test": "node --test \"tests/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
+    "unlink": "logitoolkit unlink",
+    "watch": "npm run typecheck && tsup --watch"
+  },
+  "keywords": [
+    "home-assistant",
+    "homeassistant",
+    "logitech",
+    "logi-actions-sdk",
+    "mx-creative-console",
+    "mx-creative-keypad"
+  ],
+  "author": "Maciej Majewski",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "dependencies": {
+    "@logitech/plugin-sdk": "0.1.1",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@logitech/plugin-toolkit": "0.1.1",
+    "@types/node": "^22.18.8",
+    "@types/ws": "^8.18.1",
+    "cross-env": "^7.0.3",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
+}

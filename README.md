@@ -7,7 +7,7 @@ A plugin for the [Logi Actions SDK](https://logitech.github.io/actions-sdk-docs/
 
 | Plugin | What it does |
 | --- | --- |
-| [`home-assistant-console`](plugins/home-assistant-console) | One key per [Home Assistant](https://www.home-assistant.io/) entity: the face shows the entity's live state with an icon matching its type, a press toggles it. |
+| [`home-assistant`](plugins/home-assistant) | One key per [Home Assistant](https://www.home-assistant.io/) entity: the face shows the entity's live state with an icon matching its type, a press toggles it. |
 
 ## Requirements
 
