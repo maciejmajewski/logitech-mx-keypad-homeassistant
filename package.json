@@ -1,0 +1,16 @@
+{
+  "name": "logitech-mx-keypad-homeassistant",
+  "private": true,
+  "description": "Logi Actions SDK plugin for the MX Creative Console that toggles and shows Home Assistant entities",
+  "workspaces": [
+    "plugins/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm test --workspaces",
+    "typecheck": "npm run typecheck --workspaces"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
