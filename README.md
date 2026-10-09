@@ -1,7 +1,8 @@
 # Home Assistant for the Logitech MX Creative Console
 
-A plugin for the [Logi Actions SDK](https://logitech.github.io/actions-sdk-docs/nodejs/introduction/)
-(Node.js) for exposing Home Assistant entities as toggle buttons.
+A Logi Options+ plugin that exposes Home Assistant entities as live toggle buttons on the
+keys of the MX Creative Console. Built with the Node.js
+[Logi Actions SDK](https://logitech.github.io/actions-sdk-docs/nodejs/introduction/).
 
 ## Features
 
@@ -99,17 +100,24 @@ It was developed and tested on macOS only.
 
    Entity ids are listed in Home Assistant under **Settings**, **Devices & services**,
    **Entities**. See [Configuration](#configuration) for labels, icons and custom services.
-3. **Build and link the plugin:**
+3. **Check out this repository and install its packages:**
 
    ```sh
+   git clone https://github.com/maciejmajewski/logitech-mx-keypad-homeassistant.git
+   cd logitech-mx-keypad-homeassistant
    npm install
+   ```
+
+4. **Build and link the plugin:**
+
+   ```sh
    npm run build
    npm run link      # symlinks dist/ into the Plugin Service's plugin folder and reloads the plugin
    ```
 
    For a distributable package instead, run `npm run build:pack` and double-click
    `HomeAssistant.lplug4`. `npm run unlink` removes the symlink again.
-4. **Place the keys.** In Logi Options+ open your keypad, pick a profile and a page, and add
+5. **Place the keys.** In Logi Options+ open your keypad, pick a profile and a page, and add
    actions from the **Home Assistant** groups: one group per domain ("Home Assistant lights"),
    one action per configured entity, plus **Home Assistant connection** under "Home Assistant
    status". Keys light up as soon as the plugin is subscribed.
