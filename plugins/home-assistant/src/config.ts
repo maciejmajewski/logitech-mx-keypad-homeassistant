@@ -9,7 +9,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-export const CONFIG_PATH = process.env.HOME_ASSISTANT_CONFIG ?? join(homedir(), '.config/home-assistant/config.json');
+export const CONFIG_PATH = process.env.HOME_ASSISTANT_CONFIG ?? join(homedir(), '.config/logitech-options-plus-home-assistant/config.json');
 
 // Sanity cap on configured entities (one action each).
 export const MAX_ENTITIES = 64;

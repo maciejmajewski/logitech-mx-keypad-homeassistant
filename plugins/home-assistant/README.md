@@ -73,7 +73,7 @@ Run `npm run deck` to render every glyph and face variant into `deck.png`.
 
 ## Configuration
 
-`~/.config/home-assistant/config.json`:
+`~/.config/logitech-options-plus-home-assistant/config.json`:
 
 ```json
 {
