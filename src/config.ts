@@ -158,11 +158,16 @@ export function keysChanged(a: Config, b: Config): boolean {
 
 // Asks the Plugin Service to restart this plugin so the Options+ action picker
 // picks up new key names. The service re-launches the plugin within a second.
+// The loupedeck:// deep link is opened with the platform's URL opener.
 export function requestPluginReload(): void {
   const name = process.env.LPS_PLUGIN_NAME;
-  if (!name || process.platform !== 'darwin') return;
+  if (!name) return;
+  const url = `loupedeck://plugin/${name}/reload`;
+  const [command, args] =
+    process.platform === 'darwin' ? ['/usr/bin/open', [url]] : process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]] : [undefined, []];
+  if (!command) return;
   console.info('entity config changed; reloading the plugin so Options+ shows the new names');
-  execFile('/usr/bin/open', [`loupedeck://plugin/${name}/reload`], (error) => {
+  execFile(command, args, (error) => {
     if (error) console.warn(`could not request a plugin reload: ${error.message}`);
   });
 }

@@ -10,70 +10,61 @@ it (or runs it, for scenes, scripts and buttons). State arrives by push over the
 Assistant WebSocket API, so a light switched from the wall or the app repaints its key within
 a few hundred milliseconds.
 
-## Keys
+## Disclaimer
 
-All actions appear in Logi Options+ under **Home Assistant**. Drag them onto any
-profile; the plugin has no application binding, so a page of tiles keeps working while you
-type elsewhere.
+This plugin was vibe-coded with Claude for personal use. Every effort was made to review,
+check, test and verify that it works properly, but nothing is guaranteed; use it at your own
+risk.
 
-| Group | Action | Face | Press |
-| --- | --- | --- | --- |
-| Home Assistant lights, switches, … (one group per domain) | One action per configured entity, named by its label | The entity's glyph on a rounded square: coloured while on (amber for lights, green for switches, blue for fans, teal for covers, purple for playing media, orange or blue for heating or cooling), dark grey while off, dark red with N/A while unavailable, MISSING when Home Assistant has no such entity. States that are not just on or off get a caption (OPEN, CLOSED, LOCKED, UNLOCKED, HEAT, COOL, PLAYING, DOCKED…). Label: the configured label, else the entity's friendly name. | Toggle the entity. Scenes, scripts and buttons run; automations trigger; locks lock or unlock by their state. The key flashes white for a moment on every press. |
-| Home Assistant status | Home Assistant connection | The Home Assistant logo: green ONLINE while subscribed, red TOKEN when the token is rejected, slate WAIT while connecting, grey OFFLINE or CONFIG. Label: the Home Assistant version. | Reconnect now. |
+It was developed and tested on macOS only.
 
-Only configured entities get keys. In the Options+ picker they are grouped by domain
-("Home Assistant lights", "Home Assistant switches"), named by their label, with the entity
-id in the description and the entity's glyph as the symbol. The plugin icon and the connection
-key use the official Home Assistant logomark (see NOTICE.md for its licence). While the plugin
-is not connected every entity key reads "HA offline" (or "bad token") under a greyed-out glyph.
+## Requirements
 
-Keys are identified by entity id (`light.the_office_c1` becomes the action
-`ha_light__the_office_c1`), so a key placed on a profile survives reordering or relabelling the
-config and disappears only when its entity is removed.
+- Logi Options+ with a Logi Plugin Service that runs Node.js plugins.
+- Node.js 22 or newer to build. At runtime the Logi Plugin Service uses its own bundled Node.
+- A Home Assistant instance reachable from this computer and a long-lived access token for it.
 
-## Icons
+## Installation
 
-The glyph is chosen the way the Home Assistant frontend chooses its icon, in this order:
+1. **Get a HA token.** In Home Assistant open your profile (bottom of the sidebar), the
+   **Security** tab, **Long-lived access tokens**, **Create token**. Copy it; it is shown once.
+2. **Write the config** at `~/.config/logitech-options-plus-home-assistant/config.json`
+   (create the folder). The minimum is the URL, the token and the entities you want keys for:
 
-1. `icon` in the config entry: a glyph name from the table below or an `mdi:` name;
-2. the entity's `icon` attribute (set in Home Assistant under the entity's settings), if it
-   maps to a glyph;
-3. the entity's `device_class` (outlet, garage, blind, tv, speaker…);
-4. the domain.
+   ```json
+   {
+     "url": "https://homeassistant.example.pl/",
+     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+     "entities": ["light.the_office_c1", "light.the_office_c4"]
+   }
+   ```
 
-| Glyph | Domains and classes | Some `mdi:` names |
-| --- | --- | --- |
-| `bulb` | light | lightbulb, led-* |
-| `lamp` | | ceiling-light, floor-lamp, desk-lamp, lamp, wall-sconce |
-| `strip` | | led-strip |
-| `lights` | | string-lights |
-| `tree` | | pine-tree |
-| `power` | switch | power |
-| `outlet` | switch with device_class outlet | power-socket-*, power-plug |
-| `toggle` | input_boolean, switch with device_class switch | toggle-switch, light-switch |
-| `fan` | fan | fan |
-| `blinds` | cover (blind, shade, shutter, curtain, window, awning) | blinds, roller-shade, window-shutter, curtains |
-| `garage` | cover with device_class garage, gate or door | garage, gate, door |
-| `lock` / `unlock` | lock (open padlock while unlocked) | lock, lock-open |
-| `play` | media_player | play |
-| `tv` | media_player with device_class tv | television, monitor, cast |
-| `speaker` | media_player with device_class speaker or receiver | speaker, music |
-| `thermometer` | climate, water_heater | thermostat, thermometer |
-| `flame` | | fire, radiator |
-| `snowflake` | | air-conditioner, snowflake |
-| `sparkle` | scene | palette, star, creation |
-| `script` | script | script, file |
-| `robot` | automation | robot |
-| `vacuum` | vacuum | robot-vacuum, vacuum |
-| `drop` | humidifier, valve | water, air-humidifier |
-| `bell` | siren, alarm_control_panel | bell, siren, alarm, bullhorn |
-| `camera` | camera | camera, cctv, video |
-| `remote` | remote | remote |
-| `button` | button, input_button | gesture-tap, button |
-| `house` | group | home |
-| `question` | anything else | |
+   Entity ids are listed in Home Assistant under **Settings**, **Devices & services**,
+   **Entities**. See [Configuration](#configuration) for labels, icons and custom services.
+3. **Build and link the plugin:**
 
-Run `npm run deck` to render every glyph and face variant into `deck.png`.
+   ```sh
+   npm install
+   npm run build
+   npm run link      # symlinks dist/ into the Plugin Service's plugin folder and reloads the plugin
+   ```
+
+   For a distributable package instead, run `npm run build:pack` and double-click
+   `HomeAssistant.lplug4`. `npm run unlink` removes the symlink again.
+4. **Place the keys.** In Logi Options+ open your keypad, pick a profile and a page, and add
+   actions from the **Home Assistant** groups: one group per domain ("Home Assistant lights"),
+   one action per configured entity, plus **Home Assistant connection** under "Home Assistant
+   status". Keys light up as soon as the plugin is subscribed.
+
+Check the connection key or the log if nothing lights up. On macOS the log is
+`~/Library/Application Support/Logi/LogiPluginService/Logs/plugin_logs/HomeAssistant.log`.
+"bad token" under a key means Home Assistant rejected the token; "HA offline" means the URL
+is unreachable; "no config" means the file is missing or has no url or token.
+
+The Options+ action picker caches the contents of a group once it has shown it (observed with
+Options+ 2.8). An entity added to a domain whose group the picker has already shown may not
+appear until the Plugin Service is restarted, while an entity in a new domain appears at once
+because it creates a new group.
 
 ## Configuration
 
@@ -119,6 +110,78 @@ the file, or press the connection key to try again.
 Set `HOME_ASSISTANT_DEBUG=1` in the Plugin Service environment for SDK message traces, and
 `HOME_ASSISTANT_CONFIG` to use another config file.
 
+## Keys
+
+The plugin has no application binding, so a page of keys keeps working while you type
+elsewhere. Keys are named by entity id (`light.the_office_c1` is the action
+`ha_light__the_office_c1`), so a key placed on a profile survives reordering or relabelling the
+config and disappears only when its entity is removed.
+
+What an entity key shows:
+
+- The entity's glyph (see [Icons](#icons)) on a coloured square while on: amber for lights,
+  green for switches, blue for fans, teal for covers, purple for playing media, orange or blue
+  for heating or cooling.
+- Dark grey while off; dark red with N/A while unavailable; MISSING when Home Assistant has no
+  such entity; greyed out with "HA offline" or "bad token" underneath while not connected.
+- A caption for states that are not just on or off: OPEN, CLOSED, LOCKED, UNLOCKED, HEAT,
+  COOL, PLAYING, DOCKED and so on.
+- Its label: the configured one, else the entity's friendly name.
+
+What a press does:
+
+- Toggles the entity. Scenes, scripts and buttons run; automations trigger; locks lock or
+  unlock depending on their state. `service` in the config replaces the default.
+- Flashes the key white for a moment, so a press on a scene or script is visible too.
+
+The **Home Assistant connection** key shows the Home Assistant logo: green ONLINE while
+subscribed, red TOKEN when the token is rejected, slate WAIT while connecting, grey OFFLINE or
+CONFIG. Its label is the Home Assistant version. Pressing it reconnects.
+
+## Icons
+
+The glyph is chosen the way the Home Assistant frontend chooses its icon, in this order:
+
+1. `icon` in the config entry: a glyph name from the table below or an `mdi:` name;
+2. the entity's `icon` attribute (set in Home Assistant under the entity's settings), if it
+   maps to a glyph;
+3. the entity's `device_class` (outlet, garage, blind, tv, speaker…);
+4. the domain.
+
+| Glyph | Domains and classes | Some `mdi:` names |
+| --- | --- | --- |
+| `bulb` | light | lightbulb, led-* |
+| `lamp` | | ceiling-light, floor-lamp, desk-lamp, lamp, wall-sconce |
+| `strip` | | led-strip |
+| `lights` | | string-lights |
+| `tree` | | pine-tree |
+| `power` | switch | power |
+| `outlet` | switch with device_class outlet | power-socket-*, power-plug |
+| `toggle` | input_boolean, switch with device_class switch | toggle-switch, light-switch |
+| `fan` | fan | fan |
+| `blinds` | cover (blind, shade, shutter, curtain, window, awning) | blinds, roller-shade, window-shutter, curtains |
+| `garage` | cover with device_class garage, gate or door | garage, gate, door |
+| `lock` / `unlock` | lock (open padlock while unlocked) | lock, lock-open |
+| `play` | media_player | play |
+| `tv` | media_player with device_class tv | television, monitor, cast |
+| `speaker` | media_player with device_class speaker or receiver | speaker, music |
+| `thermometer` | climate, water_heater | thermostat, thermometer |
+| `flame` | | fire, radiator |
+| `snowflake` | | air-conditioner, snowflake |
+| `sparkle` | scene | palette, star, creation |
+| `script` | script | script, file |
+| `robot` | automation | robot |
+| `vacuum` | vacuum | robot-vacuum, vacuum |
+| `drop` | humidifier, valve | water, air-humidifier |
+| `bell` | siren, alarm_control_panel | bell, siren, alarm, bullhorn |
+| `camera` | camera | camera, cctv, video |
+| `remote` | remote | remote |
+| `button` | button, input_button | gesture-tap, button |
+| `house` | group | home |
+| `question` | anything else | |
+
+Run `npm run deck` to render every glyph and face variant into `deck.png`.
+
 ## How it works
 
 - On start the plugin opens one WebSocket to `/api/websocket`, authenticates with the token,
@@ -140,34 +203,6 @@ Set `HOME_ASSISTANT_DEBUG=1` in the Plugin Service environment for SDK message t
   `@logitech/plugin-sdk` is pinned to 0.1.1 and the bridge degrades to static icons with a
   logged error if they change.
 
-## Requirements
-
-- macOS with Logi Options+ 2.2 or newer (Plugin API 6.3, which added Node.js plugins on macOS).
-- Node.js 22.18 or newer for development. At runtime the Logi Plugin Service uses its own
-  bundled Node 22.
-- A Home Assistant instance reachable from this Mac and a long-lived access token for it.
-
-## Install
-
-```sh
-npm install
-npm run build
-npm run link      # symlinks dist/ into ~/Library/Application Support/Logi/LogiPluginService/Plugins/HomeAssistant and reloads the plugin
-npm run unlink    # removes the symlink
-```
-
-Then in Logi Options+ open your keypad, choose a profile, and add actions from
-**Home Assistant**.
-
-The action picker caches the contents of a group once it has shown it (observed with
-Options+ 2.8 in the Orca Console plugin). An entity added to a domain whose group the picker
-has already shown may not appear until the Plugin Service is restarted, while an entity in a
-new domain appears at once because it creates a new group.
-Log file: `~/Library/Application Support/Logi/LogiPluginService/Logs/plugin_logs/HomeAssistant.log`.
-
-For a distributable package run `npm run build:pack` and double-click
-`HomeAssistant.lplug4`.
-
 ## Development
 
 ```sh
@@ -181,16 +216,6 @@ npm run smoke     # build, then run dist/ against a fake Plugin Service and a fa
 
 The tests include a fake Home Assistant (a local `ws` server) that drives the full
 authenticate, subscribe, toggle and reconnect flow.
-
-## Known limits and ideas
-
-- Options+ insets a Node plugin's image inside the key and writes the label underneath, so
-  the glyph plus a short caption is the whole face. Full-canvas faces need the C# SDK.
-- Only command keys for now. A dial action for brightness or volume, and sensor keys showing
-  a value, would fit the same store.
-- Each entry is one entity; `data` lets a key call a specific service, but there is no
-  per-key long-press or second action.
-- macOS only.
 
 ## Licence
 

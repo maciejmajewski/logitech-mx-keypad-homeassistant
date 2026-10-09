@@ -2,21 +2,17 @@
 
 ## Code adapted from MIT-licensed projects
 
-### logitech-mx-keypad (Orca Console)
-
-[logitech-mx-keypad](https://github.com/maciejmajewski/logitech-mx-keypad) by Maciej Majewski,
-MIT License. This plugin reuses its plugin skeleton: the build setup, the live key-face bridge,
-the PNG encoder and pixel font, the config-file watcher and the slot-key pattern.
-
 ### herdr-logi-plugin
 
 [herdr-logi-plugin](https://github.com/niklasberglund/herdr-logi-plugin) by Niklas Berglund,
-MIT License. Through Orca Console this plugin inherits code adapted from it:
+MIT License. This plugin adapts code from it:
 
 - `src/bridge.ts`: the live key-face bridge that answers `GetActionImage` / `GetActionText` on
-  the Logi Plugin SDK's private WebSocket client and pushes `ActionImageChanged` events.
+  the Logi Plugin SDK's private WebSocket client and pushes `ActionImageChanged` events, as
+  described in its `docs/dynamic-tile-images.md`.
 - `src/png.ts`: the dependency-free PNG encoder (CRC table, chunk writer, RGBA rows).
-- The zero-width-space blank label and the 10-character label cut.
+- `src/actions.ts`: the single press queue, so rapid key presses run one at a time.
+- The zero-width-space blank label and the 10-character label cut in `src/tiles.ts`.
 
 ### @logitech/plugin-toolkit
 
@@ -43,5 +39,12 @@ does not extend to these files.
 
 The [Logitech Actions SDK documentation](https://logitech.github.io/actions-sdk-docs/) and the
 [Home Assistant WebSocket API](https://developers.home-assistant.io/docs/api/websocket/)
-were the API references. Icon choices follow the Material Design Icons Home Assistant uses
-per domain; the pixel glyphs here are original drawings.
+were the API references.
+
+## Pixel glyphs
+
+The 16x16 glyphs in `src/icons.ts` were drawn for this plugin as bitmaps. They show the same
+subjects as the [Material Design Icons](https://pictogrammers.com/library/mdi/) Home Assistant
+uses per domain (bulb, padlock, fan, and so on) so that keys read the same way as the Home
+Assistant UI, but no MDI artwork was traced or converted. The 5x7 pixel font in `src/png.ts`
+is a plain bitmap font.

@@ -20,9 +20,11 @@ pluginType: remote
 pluginRuntime: nodejs
 entryPoint: index.mjs
 
-# macOS only: the plugin reloads itself through the loupedeck:// deep link
-# with `open`. Omitting pluginFolderWin marks Windows as unsupported.
+# Developed and tested on macOS; nothing in the plugin is platform-specific
+# (Node.js, pure-JS rendering, a WebSocket to Home Assistant), so Windows is
+# declared too, untested.
 pluginFolderMac: .
+pluginFolderWin: .
 
 # MX Creative Keypad: nine LCD keys, all command actions.
 supportedDevices:
