@@ -80,7 +80,7 @@ Regenerate the image with `npm run examples`.
 ## Requirements
 
 - Logi Options+ with a Logi Plugin Service that runs Node.js plugins.
-- Node.js 22 or newer to build. At runtime the Logi Plugin Service uses its own bundled Node.
+- Node.js 22 or newer, only to build from source. At runtime the Logi Plugin Service uses its own bundled Node.
 - A Home Assistant instance reachable from this computer and a long-lived access token for it.
 
 ## Installation
@@ -100,24 +100,11 @@ Regenerate the image with `npm run examples`.
 
    Entity ids are listed in Home Assistant under **Settings**, **Devices & services**,
    **Entities**. See [Configuration](#configuration) for labels, icons and custom services.
-3. **Check out this repository and install its packages:**
-
-   ```sh
-   git clone https://github.com/maciejmajewski/logitech-mx-keypad-homeassistant.git
-   cd logitech-mx-keypad-homeassistant
-   npm install
-   ```
-
-4. **Build and link the plugin:**
-
-   ```sh
-   npm run build
-   npm run link      # symlinks dist/ into the Plugin Service's plugin folder and reloads the plugin
-   ```
-
-   For a distributable package instead, run `npm run build:pack` and double-click
-   `HomeAssistant.lplug4`. `npm run unlink` removes the symlink again.
-5. **Place the keys.** In Logi Options+ open your keypad, pick a profile and a page, and add
+3. **Install the plugin.** Download `HomeAssistant-<version>.lplug4` from the
+   [latest release](https://github.com/maciejmajewski/logitech-mx-keypad-homeassistant/releases/latest)
+   and double-click it; Logi Options+ installs it. To build from source instead, see
+   [Development](#development).
+4. **Place the keys.** In Logi Options+ open your keypad, pick a profile and a page, and add
    actions from the **Home Assistant** groups: one group per domain ("Home Assistant lights"),
    one action per configured entity, plus **Home Assistant connection** under "Home Assistant
    status". Keys light up as soon as the plugin is subscribed.
@@ -271,13 +258,35 @@ Run `npm run deck` to render every glyph and face variant into `deck.png`.
 
 ## Development
 
+### Installation from source
+
+```sh
+git clone https://github.com/maciejmajewski/logitech-mx-keypad-homeassistant.git
+cd logitech-mx-keypad-homeassistant
+npm install
+npm run build
+npm run link      # symlinks dist/ into the Plugin Service's plugin folder and reloads the plugin
+npm run unlink    # removes the symlink again
+```
+
+A linked development build and an installed package cannot coexist under the same plugin
+name: Options+ reports "Installation failed" (the service log says "Error uninstalling old
+version of plugin") when a `.lplug4` is installed while the symlink is in place. Run
+`npm run unlink` before installing a package, and uninstall the package from Options+ before
+linking again.
+
+### Scripts
+
 ```sh
 npm run typecheck
-npm run watch     # rebuild, relink and reload on every change
-npm test          # node --test over tests/**/*.test.ts (TypeScript, no build step)
-npm run icons     # regenerate Icon256x256.png, src/logo.ts and the connection key's SVGs (needs rsvg-convert)
-npm run deck      # render every glyph and face variant to deck.png
-npm run smoke     # build, then run dist/ against a fake Plugin Service and a fake Home Assistant
+npm run watch        # rebuild, relink and reload on every change
+npm test             # node --test over tests/**/*.test.ts (TypeScript, no build step)
+npm run build:pack   # build and pack HomeAssistant.lplug4 for distribution
+npm run icons        # regenerate Icon256x256.png, src/logo.ts and the connection key's SVGs (needs rsvg-convert)
+npm run deck         # render every glyph and face variant to deck.png
+npm run examples     # render docs/examples.png for the README
+npm run smoke        # build, then run dist/ against a fake Plugin Service and a fake Home Assistant
+npm run release      # tag v<version>, build the .lplug4 and publish it as a GitHub release (--dry-run to only build)
 ```
 
 The tests include a fake Home Assistant (a local `ws` server) that drives the full
