@@ -31,7 +31,7 @@ WebSocket client that talks to Home Assistant.
 
 ## Home Assistant logo (not MIT)
 
-`plugins/home-assistant/assets/ha-logomark-*.svg`, and everything generated from them
+`assets/ha-logomark-*.svg`, and everything generated from them
 (`package/metadata/Icon256x256.png`, `package/action*/ha_connection.svg`, `src/logo.ts`),
 are the Home Assistant logomark from [home-assistant/assets](https://github.com/home-assistant/assets),
 licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). The logo is a
