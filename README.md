@@ -4,6 +4,14 @@ A Logi Options+ plugin that exposes Home Assistant entities as live toggle butto
 keys of the MX Creative Console. Built with the Node.js
 [Logi Actions SDK](https://logitech.github.io/actions-sdk-docs/nodejs/introduction/).
 
+## Disclaimer
+
+This plugin was vibe-coded with Claude for personal use. Every effort was made to review,
+check, test and verify that it works properly, but nothing is guaranteed; use it at your own
+risk.
+
+It was developed and tested on macOS only.
+
 ## Features
 
 - One key per [Home Assistant](https://www.home-assistant.io/) entity: lights, switches, fans,
@@ -68,14 +76,6 @@ object form adds a label, an icon or a custom service.
   version as its label.
 
 Regenerate the image with `npm run examples`.
-
-## Disclaimer
-
-This plugin was vibe-coded with Claude for personal use. Every effort was made to review,
-check, test and verify that it works properly, but nothing is guaranteed; use it at your own
-risk.
-
-It was developed and tested on macOS only.
 
 ## Requirements
 
