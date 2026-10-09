@@ -1,14 +1,72 @@
 # Home Assistant for the Logitech MX Creative Console
 
 A plugin for the [Logi Actions SDK](https://logitech.github.io/actions-sdk-docs/nodejs/introduction/)
-(Node.js) targeting the MX Creative Keypad, built like
-[logitech-mx-keypad](https://github.com/maciejmajewski/logitech-mx-keypad).
+(Node.js) for exposing Home Assistant entities as toggle buttons.
 
-Live [Home Assistant](https://www.home-assistant.io/) entities on the keypad. Each key shows
-one entity with an icon matching its type and a colour matching its state; one press toggles
-it (or runs it, for scenes, scripts and buttons). State arrives by push over the Home
-Assistant WebSocket API, so a light switched from the wall or the app repaints its key within
-a few hundred milliseconds.
+## Features
+
+- One key per [Home Assistant](https://www.home-assistant.io/) entity: lights, switches, fans,
+  covers, locks, media players, climate, scenes, scripts, automations and more.
+- Pressing button toggles the entity. Scenes, scripts and buttons run, automations trigger, locks
+  lock or unlock. Any service with any data can be configured per key instead.
+- Live state on the key: an icon matching the entity's type (from its domain, device class or
+  `mdi:` icon) on a colour matching its state, with a caption for states such as OPEN, LOCKED
+  or HEAT.
+- Push, not polling: the plugin subscribes to state changes over the Home Assistant WebSocket
+  API, so a light switched from the wall repaints its key within a few hundred milliseconds.
+- A connection key that shows whether the plugin is subscribed and reconnects on press.
+- Configured in one JSON file; edits apply within seconds without restarting Options+.
+- No native dependencies: a single bundled Node.js file renders the key faces itself.
+
+## Examples
+
+The plugin in Logi Options+: four lights placed on the keypad, and the action picker on the
+right with one entry per configured entity, grouped by domain.
+
+![Home Assistant keys in Logi Options+](docs/logitech-options-plus.png)
+
+More key faces, rendered by the plugin's own renderer with the label as Options+ draws it:
+
+![Example keys](docs/examples.png)
+
+These come from this config. Each entry is one key; a bare entity id is enough, the
+object form adds a label, an icon or a custom service.
+
+```json
+{
+  "url": "https://homeassistant.example.pl/",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "entities": [
+    { "entity": "light.the_office_c1", "label": "Office C1" },
+    { "entity": "light.xmas_the_office_olas_desk", "label": "Xmas desk", "icon": "mdi:string-lights" },
+    "switch.desk_outlet",
+    { "entity": "cover.office_blinds", "label": "Blinds" },
+    { "entity": "lock.front_door", "label": "Front door" },
+    { "entity": "climate.living_room", "label": "Living" },
+    { "entity": "media_player.tv", "label": "TV" },
+    { "entity": "scene.movie_night", "label": "Movie" },
+    { "entity": "light.desk", "label": "Desk 40%", "service": "light.turn_on", "data": { "brightness_pct": 40 } }
+  ]
+}
+```
+
+- **Office C1** is on: amber bulb. A press calls `light.toggle`.
+- **Xmas desk** is off: dark key. The `icon` override picks the string-lights glyph; without
+  it a light shows a bulb.
+- **Desk outlet** has no label in the config, so the key shows the entity's friendly name from
+  Home Assistant, and its `device_class: outlet` picks the socket glyph.
+- **Blinds** shows OPEN under the glyph; a press calls `cover.toggle`.
+- **Front door** is unlocked: red, open padlock. A press locks it; locked, a press unlocks it.
+- **Living** is heating: orange thermometer with HEAT. `climate.toggle` switches it off and
+  back on.
+- **TV** is playing: purple, with the screen glyph from `device_class: tv`.
+- **Movie** is a scene, always lit teal; a press runs `scene.turn_on` and flashes the key.
+- **Desk 40%** replaces the toggle with `light.turn_on` and `brightness_pct: 40`, so every
+  press sets that brightness.
+- The last key is the connection key, green while subscribed, with the Home Assistant
+  version as its label.
+
+Regenerate the image with `npm run examples`.
 
 ## Disclaimer
 

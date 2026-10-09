@@ -14,6 +14,7 @@
     "build:pack": "npm run build:prod && npm run pack",
     "build:prod": "npm run typecheck && cross-env NODE_ENV=production tsup",
     "deck": "node scripts/render-deck.ts",
+    "examples": "node scripts/render-examples.ts",
     "icons": "node scripts/gen-logo.ts && node scripts/gen-icons.ts",
     "link": "logitoolkit link",
     "pack": "logitoolkit pack",
