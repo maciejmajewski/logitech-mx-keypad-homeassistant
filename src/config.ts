@@ -156,17 +156,18 @@ export function keysChanged(a: Config, b: Config): boolean {
   return key(a) !== key(b);
 }
 
-// Asks the Plugin Service to restart this plugin so the Options+ action picker
-// picks up new key names. The service re-launches the plugin within a second.
-// The loupedeck:// deep link is opened with the platform's URL opener.
-export function requestPluginReload(): void {
+// Asks the Plugin Service to restart this plugin: after a config change, so
+// the Options+ action picker picks up new key names, and after a lost service
+// connection (see connection.ts). The service re-launches the plugin within a
+// second or two. The loupedeck:// deep link is opened with the platform's URL opener.
+export function requestPluginReload(reason: string): void {
   const name = process.env.LPS_PLUGIN_NAME;
   if (!name) return;
   const url = `loupedeck://plugin/${name}/reload`;
   const [command, args] =
     process.platform === 'darwin' ? ['/usr/bin/open', [url]] : process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]] : [undefined, []];
   if (!command) return;
-  console.info('entity config changed; reloading the plugin so Options+ shows the new names');
+  console.info(reason);
   execFile(command, args, (error) => {
     if (error) console.warn(`could not request a plugin reload: ${error.message}`);
   });

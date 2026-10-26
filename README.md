@@ -257,9 +257,11 @@ Run `npm run deck` to render every glyph and face variant into `deck.png`.
   logged error if they change.
 - The SDK never reconnects when its socket to the Plugin Service drops (seen after a wake from
   sleep), and the service only respawns a plugin whose process has died, so a plugin with a
-  dead socket would stay deaf until reloaded by hand. `src/connection.ts` therefore exits the
-  process on close or error; the service spawns a fresh plugin within about two seconds.
-  `kill -USR2 <plugin pid>` drops the socket on purpose to test this.
+  dead socket would stay deaf until reloaded by hand. Exiting is not enough either: the service
+  respawns the process and completes the handshake but never fetches a key face again, so every
+  key shows its static icon. `src/connection.ts` therefore asks for the reload deeplink on close
+  or error (the same request a config change makes), repeats it twice if nothing happens, and
+  only then exits. `kill -USR2 <plugin pid>` drops the socket on purpose to test this.
 
 ## Development
 

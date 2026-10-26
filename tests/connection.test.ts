@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PluginSDK } from '@logitech/plugin-sdk';
-import { exitOnDisconnect } from '../src/connection.ts';
+import { recoverOnDisconnect } from '../src/connection.ts';
 
 function fakeSdk() {
   let close: (() => void) | undefined;
@@ -19,29 +19,40 @@ function fakeSdk() {
   return { sdk, close: () => close!(), error: (e: unknown) => error!(e) };
 }
 
-const tick = () => new Promise((r) => setTimeout(r, 5));
+const after = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-test('exits with code 1 when the service connection closes', async () => {
+test('requests a reload when the service connection closes, and exits only after the attempts run out', async () => {
   const { sdk, close } = fakeSdk();
+  const reloads: string[] = [];
   const codes: number[] = [];
-  assert.equal(exitOnDisconnect(sdk, (c) => codes.push(c), 0), true);
+  assert.equal(
+    recoverOnDisconnect(sdk, { reload: (r) => reloads.push(r), exit: (c) => codes.push(c), reloadWaitMs: 5, reloadAttempts: 2 }),
+    true,
+  );
   close();
-  await tick();
+  assert.equal(reloads.length, 1);
+  assert.match(reloads[0], /closed; requesting a plugin reload \(attempt 1 of 2\)/);
+  assert.deepEqual(codes, []);
+  await after(8);
+  assert.equal(reloads.length, 2);
+  assert.deepEqual(codes, []);
+  await after(8);
+  assert.equal(reloads.length, 2);
   assert.deepEqual(codes, [1]);
 });
 
-test('exits once even when error and close both fire', async () => {
+test('recovers once even when error and close both fire', async () => {
   const { sdk, close, error } = fakeSdk();
-  const codes: number[] = [];
-  exitOnDisconnect(sdk, (c) => codes.push(c), 0);
+  const reloads: string[] = [];
+  recoverOnDisconnect(sdk, { reload: (r) => reloads.push(r), exit: () => {}, reloadWaitMs: 1000, reloadAttempts: 1 });
   error(new Error('ECONNRESET'));
   close();
-  await tick();
-  assert.deepEqual(codes, [1]);
+  assert.equal(reloads.length, 1);
+  assert.match(reloads[0], /failed \(ECONNRESET\)/);
 });
 
 test('leaves the plugin running when the SDK internals are unexpected', () => {
-  const codes: number[] = [];
-  assert.equal(exitOnDisconnect({} as PluginSDK, (c) => codes.push(c), 0), false);
-  assert.deepEqual(codes, []);
+  const reloads: string[] = [];
+  assert.equal(recoverOnDisconnect({} as PluginSDK, { reload: (r) => reloads.push(r), exit: () => {} }), false);
+  assert.deepEqual(reloads, []);
 });

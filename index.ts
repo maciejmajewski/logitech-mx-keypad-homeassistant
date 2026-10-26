@@ -3,7 +3,7 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createActions, entityActionName, Store, type PluginTile } from './src/actions.ts';
 import { writeActionAssets } from './src/assets.ts';
-import { exitOnDisconnect, installDropSignal } from './src/connection.ts';
+import { installDropSignal, recoverOnDisconnect } from './src/connection.ts';
 import { installBridge, type Notify } from './src/bridge.ts';
 import { CONFIG_PATH, ConfigSource, keysChanged, requestPluginReload, type Config } from './src/config.ts';
 import { HaClient } from './src/ha.ts';
@@ -110,7 +110,7 @@ function onConfigChange(next: Config, previous: Config) {
     // get_states, which a reconnect gives us.
     client.reconnect();
   }
-  if (keysChanged(next, previous)) requestPluginReload();
+  if (keysChanged(next, previous)) requestPluginReload('entity config changed; reloading the plugin so Options+ shows the new names');
   repaint();
 }
 
@@ -125,7 +125,9 @@ setInterval(() => {
 }, 2000);
 
 connect(store.config);
-exitOnDisconnect(sdk);
+// The SDK never reconnects when its socket to the service drops (seen after a
+// wake from sleep). Only a reload deeplink brings the keys back with faces.
+recoverOnDisconnect(sdk, { reload: requestPluginReload });
 installDropSignal(sdk);
 await sdk.connect();
 sdkConnected = true;
