@@ -3,6 +3,7 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createActions, entityActionName, Store, type PluginTile } from './src/actions.ts';
 import { writeActionAssets } from './src/assets.ts';
+import { exitOnDisconnect, installDropSignal } from './src/connection.ts';
 import { installBridge, type Notify } from './src/bridge.ts';
 import { CONFIG_PATH, ConfigSource, keysChanged, requestPluginReload, type Config } from './src/config.ts';
 import { HaClient } from './src/ha.ts';
@@ -124,6 +125,8 @@ setInterval(() => {
 }, 2000);
 
 connect(store.config);
+exitOnDisconnect(sdk);
+installDropSignal(sdk);
 await sdk.connect();
 sdkConnected = true;
 // The service keeps faces from an earlier run and only asks again when told,
